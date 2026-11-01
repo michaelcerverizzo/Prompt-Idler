@@ -1,0 +1,50 @@
+{
+  "name": "prompt-idler",
+  "displayName": "Prompt Idler",
+  "description": "Keep Windows awake during detected GitHub Copilot activity, with a manual timer fallback.",
+  "version": "0.1.0",
+  "publisher": "michaelcerverizzo",
+  "license": "UNLICENSED",
+  "repository": { "type": "git", "url": "https://github.com/michaelcerverizzo/Prompt-Idler.git" },
+  "engines": { "vscode": "^1.95.0" },
+  "categories": ["Other"],
+  "keywords": ["copilot", "awake", "windows", "sleep"],
+  "main": "./dist/extension.js",
+  "extensionKind": ["ui"],
+  "activationEvents": ["onStartupFinished"],
+  "capabilities": { "untrustedWorkspaces": { "supported": true }, "virtualWorkspaces": false },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "esbuild src/extension.ts --bundle --platform=node --target=node20 --external:vscode --outfile=dist/extension.js",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "vscode:prepublish": "npm run check && npm run build",
+    "package": "vsce package --no-dependencies --skip-license --out prompt-idler-0.1.0.vsix",
+    "validate": "npm run check && npm test && npm run build"
+  },
+  "contributes": {
+    "commands": [
+      { "command": "promptIdler.enable", "title": "Prompt Idler: Enable" },
+      { "command": "promptIdler.disable", "title": "Prompt Idler: Disable and Release Wake Requests" },
+      { "command": "promptIdler.startManual", "title": "Prompt Idler: Keep Awake for 30 Minutes" },
+      { "command": "promptIdler.stopManual", "title": "Prompt Idler: Stop Manual Keep Awake" },
+      { "command": "promptIdler.showDiagnostics", "title": "Prompt Idler: Show Diagnostics" },
+      { "command": "promptIdler.showMenu", "title": "Prompt Idler: Show Controls" }
+    ],
+    "configuration": {
+      "title": "Prompt Idler",
+      "properties": {
+        "promptIdler.enabled": { "type": "boolean", "default": true, "scope": "machine", "description": "Enable automatic detection and manual keep-awake controls on this computer. Disabling releases all wake requests." },
+        "promptIdler.keepDisplayOn": { "type": "boolean", "default": false, "scope": "machine", "description": "Also prevent idle display sleep while keeping Windows awake. Does not bypass screen locking or explicit sleep." },
+        "promptIdler.staleRequestTimeoutMinutes": { "type": "number", "minimum": 1, "maximum": 1440, "default": 60, "scope": "machine", "description": "Release a detected request if its completion is not observed within this many minutes. Long-running work may need a higher value." }
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.95.0",
+    "@vscode/vsce": "^3.7.0",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}
